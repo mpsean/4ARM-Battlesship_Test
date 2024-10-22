@@ -1,4 +1,4 @@
-import React, { useState , useRef } from 'react';
+import React, { useState } from 'react';
 import './placeship.css';
 import Square from './square.jsx';
 
@@ -9,13 +9,6 @@ function PlaceShip() {
   const [submarineRotate, setSubmarineRotate] = useState('horizontal');
   const [battlecruiserRotate, setBattlecruiserRotate] = useState('horizontal');
   const [aircraftcarrierRotate, setAircraftcarrierRotate] = useState('horizontal');
-  //const dockRef = useRef(null); //in case we want to fix the ship inside the dock 
-  const [activeShip, setActiveShip] = useState(null);
-  const [offsetX, setOffsetX] = useState(0);
-  const [offsetY, setOffsetY] = useState(0);
-
-  const boardRef = useRef(null);
-
 
   //GRID CREATION
   const createGrid = () => {
@@ -41,7 +34,7 @@ function PlaceShip() {
   //SHIP CREATION------------------------------------------------
   const createDestroyer = () => {
     let ship = [];
-    for (let i = 1; i <= 1; i++) {
+    for (let i = 1; i <= 4; i++) {
       ship.push(
         <div className="Destroyer-shipsquare" key={i}>
           [{i}] Destroyer
@@ -49,10 +42,7 @@ function PlaceShip() {
       );
     }
     return (
-      <div className={`Ship Destroyer ${destroyerRotate}`} 
-      onMouseMove={(e) => moveShip(e)}
-      onMouseDown={(e) => grabShip(e)}
-      onMouseUp={(e) => dropShip(e)}>
+      <div className={`Destroyer ${destroyerRotate}`} draggable>
         {ship}
         <button onClick={() => rotateShip('destroyer')}>Rotate Destroyer</button>
       </div>
@@ -61,7 +51,7 @@ function PlaceShip() {
 
   const createSubmarine = () => {
     let ship = [];
-    for (let i = 1; i <= 1; i++) {
+    for (let i = 1; i <= 4; i++) {
       ship.push(
         <div className="Submarine-shipsquare" key={i}>
           [{i}] Submarine
@@ -69,10 +59,7 @@ function PlaceShip() {
       );
     }
     return (
-      <div className={`Ship Submarine ${submarineRotate}`}      
-      onMouseMove={(e) => moveShip(e)}
-      onMouseDown={(e) => grabShip(e)}
-      onMouseUp={(e) => dropShip(e)}>
+      <div className={`Submarine ${submarineRotate}`} draggable>
         {ship}
         <button onClick={() => rotateShip('submarine')}>Rotate Submarine</button>
       </div>
@@ -81,7 +68,7 @@ function PlaceShip() {
 
   const createBattlecruiser = () => {
     let ship = [];
-    for (let i = 1; i <= 1; i++) {
+    for (let i = 1; i <= 4; i++) {
       ship.push(
         <div className="Battlecruiser-shipsquare" key={i}>
           [{i}] Battlecruiser
@@ -89,10 +76,8 @@ function PlaceShip() {
       );
     }
     return (
-      <div className={`Ship Battlecruiser ${battlecruiserRotate}`}
-      onMouseMove={(e) => moveShip(e)}
-      onMouseDown={(e) => grabShip(e)}
-      onMouseUp={(e) => dropShip(e)}>
+      <div className={`Battlecruiser ${battlecruiserRotate}`} draggable>
+        {ship}
         <button onClick={() => rotateShip('battlecruiser')}>Rotate Battlecruiser</button>
       </div>
     );
@@ -100,7 +85,7 @@ function PlaceShip() {
 
   const createAircraftcarrier = () => {
     let ship = [];
-    for (let i = 1; i <= 1; i++) {
+    for (let i = 1; i <= 4; i++) {
       ship.push(
         <div className="Aircraftcarrier-shipsquare" key={i}>
           [{i}] Aircraftcarrier
@@ -108,17 +93,14 @@ function PlaceShip() {
       );
     }
     return (
-      <div className={`Ship Aircraftcarrier ${aircraftcarrierRotate}`} 
-      onMouseMove={(e) => moveShip(e)}
-      onMouseDown={(e) => grabShip(e)}
-      onMouseUp={(e) => dropShip(e)}>
+      <div className={`Aircraftcarrier ${aircraftcarrierRotate}`} draggable>
         {ship}
         <button onClick={() => rotateShip('aircraftcarrier')}>Rotate Aircraft Carrier</button>
       </div>
     );
   };
 
-  //ROTATE---------------------------------------------------------
+  //ROTATE
   const rotateShip = (shipType) => {
     switch (shipType) {
       case 'destroyer':
@@ -138,58 +120,11 @@ function PlaceShip() {
     }
   };
 
-  // HANDLE DRAG AND DROP ------------------------------------------
-  const grabShip = (e) =>{
-    //const ship = e.target;
-    const ship = e.target.closest('.Ship');
-    if (ship) {
-      const rect = ship.getBoundingClientRect();
-      setOffsetX(e.clientX - rect.left);
-      setOffsetY(e.clientY - rect.top);
-      setActiveShip(ship);
-      ship.style.position = "absolute";
-      ship.style.zIndex = "1000";
-      
-    document.addEventListener('mousemove', moveShip);
-    document.addEventListener('mouseup', dropShip);
-
-  }
-}
-
-  const moveShip = (e) =>{
-    if (activeShip) {
-      const x = e.clientX - offsetX;
-      const y = e.clientY - offsetY;
-
-      activeShip.style.position = "absolute";
-      activeShip.style.left = `${x}px`;
-      activeShip.style.top = `${y}px`; 
-
-      //click again to drop
-      //document.addEventListener('mousedown', dropShip);
-      document.addEventListener('mouseup', dropShip);
-    }
-  }
-
-  const dropShip = (e) =>{
-    if (activeShip) {
-      setActiveShip(null); 
-
-      window.removeEventListener('mousemove', moveShip);
-      window.removeEventListener('mouseup', dropShip);
-      //window.removeEventListener('mousedown', dropShip);
-    }
-    e.preventDefault();
-  }
-
-  
-
   return (
     <div id="placeship">
       <h1>Grid</h1>
-      <div ref={boardRef} >{createGrid()}</div>
-      <div>
-        {createDock()}</div>
+      <div>{createGrid()}</div>
+      <div>{createDock()}</div>
     </div>
   );
 }
