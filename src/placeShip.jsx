@@ -4,11 +4,13 @@ import './placeship.css';
 const gridSize = 8;
 
 function PlaceShip() {
-  const [destroyerRotate, setDestroyerRotate] = useState('horizontal');
-  const [submarineRotate, setSubmarineRotate] = useState('horizontal');
-  const [battlecruiserRotate, setBattlecruiserRotate] = useState('horizontal');
-  const [aircraftcarrierRotate, setAircraftcarrierRotate] = useState('horizontal');
-  
+  const [shipRotations, setShipRotations] = useState({
+    destroyer: 'horizontal',
+    submarine: 'horizontal',
+    battlecruiser: 'horizontal',
+    aircraftcarrier: 'horizontal',
+  });
+
   // Store ship positions on the grid
   const [shipPositions, setShipPositions] = useState({});
 
@@ -36,54 +38,15 @@ function PlaceShip() {
   };
 
   // SHIP CREATION ------------------------------------------------
-  const createDestroyer = () => {
+  const createShip = (shipType, shipName) => {
     return (
       <div
-        className={`Destroyer ${destroyerRotate}`}
+        className={`${shipType} ${shipRotations[shipType]}`}
         draggable
-        onDragStart={(e) => handleDragStart(e, 'destroyer', 4)} // Pass 'destroyer' as ship type and size 4
+        onDragStart={(e) => handleDragStart(e, shipType, 4)} // All ships have size 4 for this example
       >
-        Destroyer
-        <button onClick={() => rotateShip('destroyer')}>Rotate Destroyer</button>
-      </div>
-    );
-  };
-
-  const createSubmarine = () => {
-    return (
-      <div
-        className={`Submarine ${submarineRotate}`}
-        draggable
-        onDragStart={(e) => handleDragStart(e, 'submarine', 4)}
-      >
-        Submarine
-        <button onClick={() => rotateShip('submarine')}>Rotate Submarine</button>
-      </div>
-    );
-  };
-
-  const createBattlecruiser = () => {
-    return (
-      <div
-        className={`Battlecruiser ${battlecruiserRotate}`}
-        draggable
-        onDragStart={(e) => handleDragStart(e, 'battlecruiser', 4)}
-      >
-        Battlecruiser
-        <button onClick={() => rotateShip('battlecruiser')}>Rotate Battlecruiser</button>
-      </div>
-    );
-  };
-
-  const createAircraftcarrier = () => {
-    return (
-      <div
-        className={`Aircraftcarrier ${aircraftcarrierRotate}`}
-        draggable
-        onDragStart={(e) => handleDragStart(e, 'aircraftcarrier', 4)}
-      >
-        Aircraft Carrier
-        <button onClick={() => rotateShip('aircraftcarrier')}>Rotate Aircraft Carrier</button>
+        {shipName}
+        <button onClick={() => rotateShip(shipType)}>Rotate {shipName}</button>
       </div>
     );
   };
@@ -91,10 +54,10 @@ function PlaceShip() {
   const createDock = () => {
     return (
       <div id="dock">
-        {createDestroyer()}
-        {createSubmarine()}
-        {createBattlecruiser()}
-        {createAircraftcarrier()}
+        {createShip('destroyer', 'Destroyer')}
+        {createShip('submarine', 'Submarine')}
+        {createShip('battlecruiser', 'Battlecruiser')}
+        {createShip('aircraftcarrier', 'Aircraft Carrier')}
       </div>
     );
   };
@@ -114,14 +77,29 @@ function PlaceShip() {
 
     const newShipPositions = { ...shipPositions };
     const { type, size } = draggedShip;
-    const isHorizontal = destroyerRotate === 'horizontal'; // Adjust this to use the correct rotation state
+    const isHorizontal = shipRotations[type] === 'horizontal'; // Use the correct rotation state
 
+    // Check for placement restrictions
     if (isHorizontal) {
+      // Restrict horizontal placements on certain squares
+      const invalidPositions = [6, 7, 8, 14, 15, 16, 22, 23, 24, 30, 31, 32, 38, 39, 40, 46, 47, 48, 54, 55, 56, 62, 63, 64];
+      if (invalidPositions.includes(squareId)) {
+        alert("Cannot place ship here!");
+        return;
+      }
+
+      // Place ship horizontally
       for (let i = 0; i < size; i++) {
         newShipPositions[squareId + i] = `${type}`;
       }
     } else {
-      // Vertical placement
+      // Restrict vertical placements on rows 41 to 64
+      if (squareId >= 41) {
+        alert("Cannot place ship here!");
+        return;
+      }
+
+      // Place ship vertically
       for (let i = 0; i < size; i++) {
         const verticalPosition = squareId + i * gridSize; // Calculate vertical position
         if (verticalPosition <= gridSize * gridSize) { // Ensure within grid bounds
@@ -136,22 +114,10 @@ function PlaceShip() {
 
   // ROTATE --------------------------------------------------------
   const rotateShip = (shipType) => {
-    switch (shipType) {
-      case 'destroyer':
-        setDestroyerRotate((prev) => (prev === 'horizontal' ? 'vertical' : 'horizontal'));
-        break;
-      case 'submarine':
-        setSubmarineRotate((prev) => (prev === 'horizontal' ? 'vertical' : 'horizontal'));
-        break;
-      case 'battlecruiser':
-        setBattlecruiserRotate((prev) => (prev === 'horizontal' ? 'vertical' : 'horizontal'));
-        break;
-      case 'aircraftcarrier':
-        setAircraftcarrierRotate((prev) => (prev === 'horizontal' ? 'vertical' : 'horizontal'));
-        break;
-      default:
-        break;
-    }
+    setShipRotations((prev) => ({
+      ...prev,
+      [shipType]: prev[shipType] === 'horizontal' ? 'vertical' : 'horizontal'
+    }));
   };
 
   // RENDER --------------------------------------------------------
@@ -165,3 +131,5 @@ function PlaceShip() {
 }
 
 export default PlaceShip;
+
+
