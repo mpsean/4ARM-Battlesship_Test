@@ -9,96 +9,124 @@ function PlaceShip() {
   const [battlecruiserRotate, setBattlecruiserRotate] = useState('horizontal');
   const [aircraftcarrierRotate, setAircraftcarrierRotate] = useState('horizontal');
 
+  // Store ship positions on the grid ๑
+  const [shipPositions, setShipPositions] = useState({});
+
+  // Track which ship is being dragged ๑
+  const [draggedShip, setDraggedShip] = useState(null);
+
+  
   //GRID CREATION
   const createGrid = () => {
     let board = [];
     for (let i = 1; i <= gridSize * gridSize; i++) {
       board.push(
-        <div className="square" id={i} key={i}>
-          [{i}]
+        //Change the variable here ๑
+        <div
+          className="square"
+          id={i}
+          key={i}
+          onDragOver={handleDragOver}
+          onDrop={(e) => handleDrop(e, i)}
+        >
+          {/* Display ship if one is placed in this square */}
+          {shipPositions[i] ? shipPositions[i] : `[${i}]`}
         </div>
+        //๑
       );
     }
     return <div id="placeship-grid">{board}</div>;
   };
 
+  //change all dock function to handle dragdrop
   const createDock = () => {
-    let Dock = [];
-    Dock.push(createDestroyer());
-    Dock.push(createSubmarine());
-    Dock.push(createBattlecruiser());
-    Dock.push(createAircraftcarrier());
-
-    return <div id="dock">{Dock}</div>;
+    return (
+      <div id="dock">
+        {createDestroyer()}
+        {createSubmarine()}
+        {createBattlecruiser()}
+        {createAircraftcarrier()}
+      </div>
+    );
   };
 
   //SHIP CREATION------------------------------------------------
+  //change all the createShip function to handle dragdrop @
   const createDestroyer = () => {
-    let ship = [];
-    for (let i = 1; i <= 4; i++) {
-      ship.push(
-        <div className="Destroyer-shipsquare" key={i}>
-          [{i}] Destroyer
-        </div>
-      );
-    }
     return (
-      <div className={`Destroyer ${destroyerRotate}`} draggable>
-        {ship}
+      <div
+        className={`Destroyer ${destroyerRotate}`}
+        draggable
+        onDragStart={(e) => handleDragStart(e, 'destroyer', 4)} // Pass 'destroyer' as ship type and size 4
+      >
+        Destroyer
         <button onClick={() => rotateShip('destroyer')}>Rotate Destroyer</button>
       </div>
     );
   };
 
   const createSubmarine = () => {
-    let ship = [];
-    for (let i = 1; i <= 4; i++) {
-      ship.push(
-        <div className="Submarine-shipsquare" key={i}>
-          [{i}] Submarine
-        </div>
-      );
-    }
     return (
-      <div className={`Submarine ${submarineRotate}`} draggable>
-        {ship}
+      <div
+        className={`Submarine ${submarineRotate}`}
+        draggable
+        onDragStart={(e) => handleDragStart(e, 'submarine', 4)}
+      >
+        Submarine
         <button onClick={() => rotateShip('submarine')}>Rotate Submarine</button>
       </div>
     );
   };
 
   const createBattlecruiser = () => {
-    let ship = [];
-    for (let i = 1; i <= 4; i++) {
-      ship.push(
-        <div className="Battlecruiser-shipsquare" key={i}>
-          [{i}] Battlecruiser
-        </div>
-      );
-    }
     return (
-      <div className={`Battlecruiser ${battlecruiserRotate}`} draggable>
-        {ship}
+      <div
+        className={`Battlecruiser ${battlecruiserRotate}`}
+        draggable
+        onDragStart={(e) => handleDragStart(e, 'battlecruiser', 4)}
+      >
+        Battlecruiser
         <button onClick={() => rotateShip('battlecruiser')}>Rotate Battlecruiser</button>
       </div>
     );
   };
 
   const createAircraftcarrier = () => {
-    let ship = [];
-    for (let i = 1; i <= 4; i++) {
-      ship.push(
-        <div className="Aircraftcarrier-shipsquare" key={i}>
-          [{i}] Aircraftcarrier
-        </div>
-      );
-    }
     return (
-      <div className={`Aircraftcarrier ${aircraftcarrierRotate}`} draggable>
-        {ship}
+      <div
+        className={`Aircraftcarrier ${aircraftcarrierRotate}`}
+        draggable
+        onDragStart={(e) => handleDragStart(e, 'aircraftcarrier', 4)}
+      >
+        Aircraftcarrier
         <button onClick={() => rotateShip('aircraftcarrier')}>Rotate Aircraft Carrier</button>
       </div>
     );
+  };
+
+  // HANDLE DRAG AND DROP
+
+  const handleDragStart = (e, shipType, shipSize) => {
+    setDraggedShip({ type: shipType, size: shipSize });
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault(); // Required to allow dropping
+  };
+
+  const handleDrop = (e, squareId) => {
+    if (!draggedShip) return;
+
+    const newShipPositions = { ...shipPositions };
+    const { type, size } = draggedShip;
+
+    // For simplicity, we'll assume horizontal placement for now
+    for (let i = 0; i < size; i++) {
+      newShipPositions[squareId + i] = `${type}`;
+    }
+
+    setShipPositions(newShipPositions);
+    setDraggedShip(null); // Clear the dragged ship
   };
 
   //ROTATE
@@ -121,6 +149,7 @@ function PlaceShip() {
     }
   };
 
+  //RENDER
   return (
     <div id="placeship">
       <h1>Grid</h1>
