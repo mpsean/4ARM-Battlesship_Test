@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './placeship.css';
+import Square from './square.jsx';
 
 const gridSize = 8;
 
@@ -14,9 +15,7 @@ function PlaceShip() {
     let board = [];
     for (let i = 1; i <= gridSize * gridSize; i++) {
       board.push(
-        <div className="square" id={i} key={i}>
-          [{i}]
-        </div>
+        <Square id={i} empty={'empty'} ship={null} hit={'no-hit'} />
       );
     }
     return <div id="placeship-grid">{board}</div>;

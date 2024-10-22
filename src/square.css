@@ -1,0 +1,11 @@
+.square {
+  /* Grid squares styling */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 70px;
+  height: 70px;
+  color: whitesmoke;
+  background-color: navy;
+  border: 1px solid white;
+}
