@@ -1,0 +1,141 @@
+#placeship {
+  /* Main container styling */
+  display: flex;
+  align-items: center;
+  column-gap: 70px;
+}
+
+#placeship-grid {
+  /* Ocean grid */
+  display: grid;
+  grid-template-columns: repeat(8, 80px);
+  grid-template-rows: repeat(8, 80px);
+  width: 640px;
+  height: 640px;
+  background-color: aqua;
+}
+
+#dock {
+  /* Ship dock */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 480px;
+  height: 640px;
+  background-color: lightblue;
+}
+
+#placeship-grid .square {
+  /* Grid squares styling */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 70px;
+  height: 70px;
+  color: whitesmoke;
+  background-color: navy;
+  border: 1px solid white;
+}
+
+/* shipsquare */
+.Destroyer-shipsquare {
+  color: azure;
+  width: 80px;
+  height: 80px;
+  border: 1px solid black;
+}
+
+.Submarine-shipsquare {
+  color: azure;
+  width: 80px;
+  height: 80px;
+  border: 1px solid black;
+}
+
+.Battlecruiser-shipsquare {
+  color: azure;
+  width: 80px;
+  height: 80px;
+  border: 1px solid black;
+}
+
+.Aircraftcarrier-shipsquare {
+  color: azure;
+  width: 80px;
+  height: 80px;
+  border: 1px solid black;
+}
+
+/* Destroyer*/
+.Destroyer {
+  display: flex;
+  background-color: orange;
+}
+
+.Destroyer.horizontal {
+  width: 320px;
+  height: 80px;
+  flex-direction: row;
+}
+
+.Destroyer.vertical {
+  width: 80px;
+  height: 320px;
+  flex-direction: column;
+}
+
+/* Submarine*/
+.Submarine {
+  display: flex;
+  background-color: teal;
+}
+
+.Submarine.horizontal {
+  width: 320px;
+  height: 80px;
+  flex-direction: row;
+}
+
+.Submarine.vertical {
+  width: 80px;
+  height: 320px;
+  flex-direction: column;
+}
+
+/* Battlecruiser*/
+.Battlecruiser {
+  display: flex;
+  background-color: yellow;
+  color: black;
+}
+
+.Battlecruiser.horizontal {
+  width: 320px;
+  height: 80px;
+  flex-direction: row;
+}
+
+.Battlecruiser.vertical {
+  width: 80px;
+  height: 320px;
+  flex-direction: column;
+}
+
+/* Aircraft carrier */
+.Aircraftcarrier {
+  display: flex;
+  background-color: gray;
+}
+
+.Aircraftcarrier.horizontal {
+  width: 320px;
+  height: 80px;
+  flex-direction: row;
+}
+
+.Aircraftcarrier.vertical {
+  width: 80px;
+  height: 320px;
+  flex-direction: column;
+}
