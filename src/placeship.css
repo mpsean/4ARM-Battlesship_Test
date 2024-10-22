@@ -150,3 +150,49 @@
   margin: 10px;
   /* Add some space between containers */
 }
+
+
+/*----------- This is the new CSS file for new code -----------*/
+
+.App {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.dock {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin-bottom: 20px;
+  width: 200px;
+}
+
+.ship {
+  padding: 10px;
+  margin-bottom: 5px;
+  background-color: #007bff;
+  color: white;
+  text-align: center;
+  cursor: pointer;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(8, 50px);
+  grid-template-rows: repeat(8, 50px);
+  gap: 2px;
+}
+
+.grid-cell {
+  width: 50px;
+  height: 50px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+
+

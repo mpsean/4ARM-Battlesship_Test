@@ -1,139 +1,163 @@
 import React, { useState } from 'react';
 import './placeship.css';
 
-const gridSize = 8;
+const GRID_SIZE = 8;
+const SHIP_SIZE = 4; // Assume all ships occupy 4 cells
+const initialShips = [
+  { id: 'a', name: "Ship A", x: null, y: null },
+  { id: 'b', name: "Ship B", x: null, y: null },
+  { id: 'c', name: "Ship C", x: null, y: null },
+  { id: 'd', name: "Ship D", x: null, y: null },
+];
 
 function PlaceShip() {
-  const [shipRotations, setShipRotations] = useState({
-    destroyer: 'horizontal',
-    submarine: 'horizontal',
-    battlecruiser: 'horizontal',
-    aircraftcarrier: 'horizontal',
-  });
-
-  // Store ship positions on the grid
-  const [shipPositions, setShipPositions] = useState({});
-
-  // Track which ship is being dragged
-  const [draggedShip, setDraggedShip] = useState(null);
-
-  // GRID CREATION
-  const createGrid = () => {
-    let board = [];
-    for (let i = 1; i <= gridSize * gridSize; i++) {
-      board.push(
-        <div
-          className="square"
-          id={i}
-          key={i}
-          onDragOver={handleDragOver}
-          onDrop={(e) => handleDrop(e, i)}
-        >
-          {/* Display ship if one is placed in this square */}
-          {shipPositions[i] ? shipPositions[i] : `[${i}]`}
-        </div>
-      );
-    }
-    return <div id="placeship-grid">{board}</div>;
-  };
-
-  // SHIP CREATION ------------------------------------------------
-  const createShip = (shipType, shipName) => {
-    return (
-      <div
-        className={`${shipType} ${shipRotations[shipType]} dock-ship`}
-        draggable
-        onDragStart={(e) => handleDragStart(e, shipType, 4)} // All ships have size 4 for this example
-      >
-        <div className="ship-name">{shipName}</div>
-        <button onClick={() => rotateShip(shipType)}>Rotate {shipName}</button>
-      </div>
-    );
-  };
-
-  const createDock = () => {
-  return (
-    <div id="dock">
-      <div className="ship-container">
-        {createShip('destroyer', 'Destroyer')}
-      </div>
-      <div className="ship-container">
-        {createShip('submarine', 'Submarine')}
-      </div>
-      <div className="ship-container">
-        {createShip('battlecruiser', 'Battlecruiser')}
-      </div>
-      <div className="ship-container">
-        {createShip('aircraftcarrier', 'Aircraft Carrier')}
-      </div>
-    </div>
+  const [grid, setGrid] = useState(
+    Array.from({ length: GRID_SIZE }, () =>
+      Array.from({ length: GRID_SIZE }, () => ({ shipOccupie: null }))
+    )
   );
-};
+  const [ships, setShips] = useState(initialShips);
+  const [draggingShip, setDraggingShip] = useState(null);
+  const [isHorizontal, setIsHorizontal] = useState(true); // Universal isHorizontal
 
-  // HANDLE DRAG AND DROP ------------------------------------------
+  // Handle drag start
+  function handleDragStart(ship) {
+    setDraggingShip(ship);
+  }
 
-  const handleDragStart = (e, shipType, shipSize) => {
-    setDraggedShip({ type: shipType, size: shipSize });
-  };
+  // Handle drag over grid
+  function handleDragOver(e) {
+    e.preventDefault();
+  }
 
-  const handleDragOver = (e) => {
-    e.preventDefault(); // Required to allow dropping
-  };
-
-  const handleDrop = (e, squareId) => {
-    if (!draggedShip) return;
-
-    const newShipPositions = { ...shipPositions };
-    const { type, size } = draggedShip;
-    const isHorizontal = shipRotations[type] === 'horizontal'; // Use the correct rotation state
-
-    // Check for placement restrictions
+  // Check if the cells are free for placing the ship
+  function canPlaceShip(x, y) {
     if (isHorizontal) {
-      // Restrict horizontal placements on certain squares
-      const invalidPositions = [6, 7, 8, 14, 15, 16, 22, 23, 24, 30, 31, 32, 38, 39, 40, 46, 47, 48, 54, 55, 56, 62, 63, 64];
-      if (invalidPositions.includes(squareId)) {
-        alert("Cannot place ship here!");
-        return;
-      }
-
-      // Place ship horizontally
-      for (let i = 0; i < size; i++) {
-        newShipPositions[squareId + i] = `${type}`;
+      // Check if the ship can fit horizontally and if the cells are unoccupied
+      if (y + SHIP_SIZE > GRID_SIZE) return false; // Out of bounds check
+      for (let i = 0; i < SHIP_SIZE; i++) {
+        if (grid[x][y + i].shipOccupie !== null) {
+          return false; // The cell is already occupied
+        }
       }
     } else {
-      // Restrict vertical placements on rows 41 to 64
-      if (squareId >= 41) {
-        alert("Cannot place ship here!");
-        return;
-      }
-
-      // Place ship vertically
-      for (let i = 0; i < size; i++) {
-        const verticalPosition = squareId + i * gridSize; // Calculate vertical position
-        if (verticalPosition <= gridSize * gridSize) { // Ensure within grid bounds
-          newShipPositions[verticalPosition] = `${type}`;
+      // Check if the ship can fit vertically and if the cells are unoccupied
+      if (x + SHIP_SIZE > GRID_SIZE) return false; // Out of bounds check
+      for (let i = 0; i < SHIP_SIZE; i++) {
+        if (grid[x + i][y].shipOccupie !== null) {
+          return false; // The cell is already occupied
         }
       }
     }
+    return true; // All cells are free to place the ship
+  }
 
-    setShipPositions(newShipPositions);
-    setDraggedShip(null); // Clear the dragged ship
-  };
+  // Handle drop on grid
+  function handleDrop(x, y) {
+    if (draggingShip) {
+      // Check if the ship can be placed
+      if (!canPlaceShip(x, y)) {
+        alert("Cannot place the ship here, cells are occupied!");
+        return; // Prevent placing the ship
+      }
 
-  // ROTATE --------------------------------------------------------
-  const rotateShip = (shipType) => {
-    setShipRotations((prev) => ({
-      ...prev,
-      [shipType]: prev[shipType] === 'horizontal' ? 'vertical' : 'horizontal'
-    }));
-  };
+      const updatedShips = ships.map(function (ship) {
+        return ship.id === draggingShip.id ? { ...ship, x, y } : ship;
+      });
+      setShips(updatedShips);
 
-  // RENDER --------------------------------------------------------
+      // Update the grid with ship occupying multiple cells
+      const updatedGrid = grid.map((row, rowIndex) =>
+        row.map((cell, colIndex) => {
+          if (isHorizontal) {
+            if (rowIndex === x && colIndex >= y && colIndex < y + SHIP_SIZE) {
+              return { ...cell, shipOccupie: draggingShip.id };
+            }
+          } else {
+            if (colIndex === y && rowIndex >= x && rowIndex < x + SHIP_SIZE) {
+              return { ...cell, shipOccupie: draggingShip.id };
+            }
+          }
+          return cell;
+        })
+      );
+      setGrid(updatedGrid);
+
+      // Reset dragging ship
+      setDraggingShip(null);
+    }
+  }
+
+  // Handle flipping ship orientation
+  function handleFlip() {
+    setIsHorizontal(!isHorizontal);
+  }
+
+  // Reset all ships back to dock
+  function handleReset() {
+    setShips(initialShips);
+    setGrid(
+      Array.from({ length: GRID_SIZE }, () =>
+        Array.from({ length: GRID_SIZE }, () => ({ shipOccupie: null }))
+      )
+    );
+  }
+
+  // Render a grid cell
+  function renderGridCell(x, y) {
+    const { shipOccupie } = grid[x][y]; // Extract shipOccupie
+
+    return (
+      <div
+        key={`${x}-${y}`}
+        className="grid-cell"
+        onDragOver={handleDragOver}
+        onDrop={() => handleDrop(x, y)}
+      >
+        {/* Only display shipOccupie */}
+        <div> {shipOccupie !== null ? shipOccupie : "null"}</div>
+      </div>
+    );
+  }
+
   return (
-    <div id="placeship">
-      <h1>Grid</h1>
-      <div>{createGrid()}</div>
-      <div>{createDock()}</div>
+    <div className="App">
+      <h1>Ship Dock and Grid</h1>
+
+      {/* Flip button */}
+      <button onClick={handleFlip}>Flip Ship</button>
+
+      {/* Reset button */}
+      <button onClick={handleReset}>Reset Ships</button>
+      
+      {/* Show current orientation */}
+      <h2>{isHorizontal ? "Horizontal" : "Vertical"}</h2>
+
+      {/* Dock for ships */}
+      <div className="dock">
+        <h2>Ship Dock</h2>
+        {ships.map(function (ship) {
+          return ship.x === null && (
+            <div
+              key={ship.id}
+              className="ship"
+              draggable
+              onDragStart={() => handleDragStart(ship)}
+            >
+              {ship.name} ({isHorizontal ? "Horizontal" : "Vertical"})
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Grid */}
+      <div className="grid">
+        {Array.from({ length: GRID_SIZE }, function (_, x) {
+          return Array.from({ length: GRID_SIZE }, function (_, y) {
+            return renderGridCell(x, y);
+          });
+        })}
+      </div>
     </div>
   );
 }
