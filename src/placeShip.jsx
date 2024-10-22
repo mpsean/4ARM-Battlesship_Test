@@ -41,26 +41,34 @@ function PlaceShip() {
   const createShip = (shipType, shipName) => {
     return (
       <div
-        className={`${shipType} ${shipRotations[shipType]}`}
+        className={`${shipType} ${shipRotations[shipType]} dock-ship`}
         draggable
         onDragStart={(e) => handleDragStart(e, shipType, 4)} // All ships have size 4 for this example
       >
-        {shipName}
+        <div className="ship-name">{shipName}</div>
         <button onClick={() => rotateShip(shipType)}>Rotate {shipName}</button>
       </div>
     );
   };
 
   const createDock = () => {
-    return (
-      <div id="dock">
+  return (
+    <div id="dock">
+      <div className="ship-container">
         {createShip('destroyer', 'Destroyer')}
+      </div>
+      <div className="ship-container">
         {createShip('submarine', 'Submarine')}
+      </div>
+      <div className="ship-container">
         {createShip('battlecruiser', 'Battlecruiser')}
+      </div>
+      <div className="ship-container">
         {createShip('aircraftcarrier', 'Aircraft Carrier')}
       </div>
-    );
-  };
+    </div>
+  );
+};
 
   // HANDLE DRAG AND DROP ------------------------------------------
 
@@ -131,5 +139,3 @@ function PlaceShip() {
 }
 
 export default PlaceShip;
-
-

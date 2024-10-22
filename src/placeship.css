@@ -139,3 +139,14 @@
   height: 320px;
   flex-direction: column;
 }
+
+.ship-container {
+  display: flex;
+  /* Use flexbox for alignment */
+  flex-direction: column;
+  /* Stack ship name, button, and ship display vertically */
+  align-items: center;
+  /* Center align items within the container */
+  margin: 10px;
+  /* Add some space between containers */
+}
