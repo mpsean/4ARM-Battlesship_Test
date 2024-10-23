@@ -7,12 +7,11 @@
 
 import './square.css';
 
-export default function square({ id, empty, ship, hit }) {
+export default function square({ id, ship}) {
   const className = ["square",
     id,
-    empty,
     ship,
-    hit].filter(Boolean).join(' ');
+    ].filter(Boolean).join(' ');
 
 
   return (
