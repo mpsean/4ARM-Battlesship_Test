@@ -61,27 +61,47 @@ function PlaceShip() {
         return; // Prevent placing the ship
       }
 
-      const updatedShips = ships.map(function (ship) {
-        return ship.id === draggingShip.id ? { ...ship, x, y } : ship;
-      });
-      setShips(updatedShips);
-
-      // Update the grid with ship occupying multiple cells
+      // Clear old position of the dragging ship from the grid
       const updatedGrid = grid.map((row, rowIndex) =>
         row.map((cell, colIndex) => {
-          if (isHorizontal) {
-            if (rowIndex === x && colIndex >= y && colIndex < y + SHIP_SIZE) {
-              return { ...cell, shipOccupie: draggingShip.id };
-            }
-          } else {
-            if (colIndex === y && rowIndex >= x && rowIndex < x + SHIP_SIZE) {
-              return { ...cell, shipOccupie: draggingShip.id };
+          if (draggingShip.x !== null && draggingShip.y !== null) {
+            if (isHorizontal) {
+              if (rowIndex === draggingShip.x && colIndex >= draggingShip.y && colIndex < draggingShip.y + SHIP_SIZE) {
+                return { ...cell, shipOccupie: null }; // Clear old horizontal position
+              }
+            } else {
+              if (colIndex === draggingShip.y && rowIndex >= draggingShip.x && rowIndex < draggingShip.x + SHIP_SIZE) {
+                return { ...cell, shipOccupie: null }; // Clear old vertical position
+              }
             }
           }
           return cell;
         })
       );
-      setGrid(updatedGrid);
+
+      // Place the ship in its new position
+      const newGrid = updatedGrid.map((row, rowIndex) =>
+        row.map((cell, colIndex) => {
+          if (isHorizontal) {
+            if (rowIndex === x && colIndex >= y && colIndex < y + SHIP_SIZE) {
+              return { ...cell, shipOccupie: draggingShip.id }; // Update new horizontal position
+            }
+          } else {
+            if (colIndex === y && rowIndex >= x && rowIndex < x + SHIP_SIZE) {
+              return { ...cell, shipOccupie: draggingShip.id }; // Update new vertical position
+            }
+          }
+          return cell;
+        })
+      );
+
+      setGrid(newGrid);
+
+      // Update the ship's position in the ships array
+      const updatedShips = ships.map(function (ship) {
+        return ship.id === draggingShip.id ? { ...ship, x, y } : ship;
+      });
+      setShips(updatedShips);
 
       // Reset dragging ship
       setDraggingShip(null);
@@ -114,8 +134,17 @@ function PlaceShip() {
         onDragOver={handleDragOver}
         onDrop={() => handleDrop(x, y)}
       >
-        {/* Only display shipOccupie */}
-        <div> {shipOccupie !== null ? shipOccupie : "null"}</div>
+        {/* Allow dragging ship already placed in the grid */}
+        {shipOccupie ? (
+          <div
+            draggable
+            onDragStart={() => handleDragStart(ships.find(ship => ship.id === shipOccupie))}
+          >
+            {shipOccupie}
+          </div>
+        ) : (
+          <div> {shipOccupie !== null ? shipOccupie : "null"}</div>
+        )}
       </div>
     );
   }
